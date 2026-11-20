@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101225">
+  <title>Mojimaro AI Clipper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#"><span class="brand-mark">M</span><span>MOJIMARO <small>AI CLIPPER</small></span></a>
+      <nav>
+        <a class="nav-link active" href="#dashboard">▦ <span>Dashboard</span></a>
+        <a class="nav-link" href="#create">✂ <span>Create clips</span></a>
+        <a class="nav-link" href="#projects">▤ <span>My projects</span></a>
+      </nav>
+      <div class="sidebar-note"><span class="pulse"></span> Your creative studio<br><small>Make every moment count.</small></div>
+      <div class="sidebar-bottom">MOJIMARO © 2026</div>
+    </aside>
+
+    <main class="main-content" id="dashboard">
+      <header class="topbar">
+        <button class="menu-button" id="menuButton" aria-label="Toggle menu">☰</button>
+        <div><span class="eyebrow">YOUR CREATIVE WORKSPACE</span><h1>Video clipping studio</h1></div>
+        <div class="avatar">M</div>
+      </header>
+
+      <section class="welcome">
+        <div>
+          <span class="eyebrow">WELCOME TO MOJIMARO</span>
+          <h2>Turn long videos into<br><em>scroll-stopping clips.</em></h2>
+          <p>Bring your video. Find the moments worth sharing. Create short-form content for your audience.</p>
+          <a class="button primary" href="#create">＋ Start a project</a>
+        </div>
+        <div class="welcome-art" aria-hidden="true">
+          <div class="video-card back-card"><span>✦</span><b>YOUR STORY</b></div>
+          <div class="video-card front-card"><div class="play">▶</div><div class="wave"></div><small>MAKE IT A MOMENT</small></div>
+          <div class="spark spark-one">✦</div><div class="spark spark-two">✧</div>
+        </div>
+      </section>
+
+      <section class="stats" aria-label="Workspace overview">
+        <article class="stat-card"><span class="stat-icon purple">▣</span><div><strong id="projectCount">0</strong><small>Projects created</small></div></article>
+        <article class="stat-card"><span class="stat-icon blue">✂</span><div><strong>—</strong><small>Clips generated</small></div></article>
+        <article class="stat-card"><span class="stat-icon orange">◷</span><div><strong>AI ready</strong><small>Processing status</small></div></article>
+      </section>
+
+      <section class="workspace-grid" id="create">
+        <div class="panel create-panel">
+          <div class="section-heading"><div><span class="eyebrow">STEP 01</span><h3>Start with a video</h3></div><span class="tag">NEW PROJECT</span></div>
+          <p class="muted">Paste a link from a supported source or choose a video file you own or have permission to edit.</p>
+          <form id="projectForm">
+            <label for="videoUrl">Video link</label>
+            <div class="input-wrap"><span>↗</span><input id="videoUrl" type="url" placeholder="https://www.youtube.com/..." autocomplete="url"></div>
+            <div class="or"><span>OR UPLOAD A VIDEO</span></div>
+            <label class="upload-box" for="videoFile"><span class="upload-icon">↑</span><b>Choose a video file</b><small>MP4, MOV or WEBM · Local preview only in this starter</small><input id="videoFile" type="file" accept="video/mp4,video/quicktime,video/webm"></label>
+            <label for="clipStyle">Clip style</label>
+            <select id="clipStyle"><option>Entertainment highlights</option><option>Funny moments</option><option>Podcast moments</option><option>Celebrity interviews</option><option>Inspirational moments</option></select>
+            <label for="clipCount">Number of clip ideas</label>
+            <select id="clipCount"><option value="3">3 clip ideas</option><option value="5" selected>5 clip ideas</option><option value="10">10 clip ideas</option></select>
+            <button class="button primary full" type="submit">Create project <span>→</span></button>
+            <p class="form-message" id="formMessage" role="status"></p>
+          </form>
+        </div>
+
+        <div class="panel tips-panel">
+          <span class="eyebrow">THE MOJIMARO METHOD</span><h3>From long-form to<br>must-watch moments.</h3>
+          <div class="tip"><span>01</span><div><b>Find the moment</b><small>Spot a funny, surprising or useful moment.</small></div></div>
+          <div class="tip"><span>02</span><div><b>Shape the story</b><small>Give the clip a clear beginning and payoff.</small></div></div>
+          <div class="tip"><span>03</span><div><b>Make it social</b><small>Add readable captions and a strong opening.</small></div></div>
+          <div class="rights-note">Only upload or process content you own or are authorised to use. Platform links may require an approved integration.</div>
+        </div>
+      </section>
+
+      <section class="panel projects-panel" id="projects">
+        <div class="section-heading"><div><span class="eyebrow">YOUR WORK</span><h3>Recent projects</h3></div><span class="muted" id="projectLabel">0 projects</span></div>
+        <div id="projectList" class="empty-state"><div class="empty-icon">▤</div><b>Your projects will appear here</b><p>Start by adding a video above.</p></div>
+      </section>
+      <footer>Made with ambition by <b>MOJIMARO</b> <span>·</span> AI clipping studio</footer>
+    </main>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
