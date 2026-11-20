@@ -7,8 +7,7 @@ const projectList = document.getElementById("projectList");
 const projectCount = document.getElementById("projectCount");
 const projectLabel = document.getElementById("projectLabel");
 
-const API_URL =
-  "https://mojimaro-ai-engin.mojimaroza.workers.dev";
+const API_URL = "https://mojimaro-ai-engin.mojimaroza.workers.dev";
 
 let projects = [];
 
@@ -22,6 +21,7 @@ if (menuButton && sidebar) {
 }
 
 function showMessage(text, success = false) {
+  if (!message) return;
   message.textContent = text;
   message.style.color = success ? "#a9e5c9" : "#ffb3b3";
 }
@@ -31,109 +31,125 @@ if (fileInput) {
     if (fileInput.files[0]) {
       showMessage(
         "Selected: " + fileInput.files[0].name +
-        ". Link processing is being connected first.",
+        ". File processing is not connected yet.",
         true
       );
     }
   });
 }
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
+if (form) {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-  const url = urlInput.value.trim();
-  const file = fileInput.files[0];
+    const url = urlInput?.value.trim();
+    const file = fileInput?.files[0];
 
-  if (file) {
-    showMessage(
-      "Video upload processing is not connected yet. Please test with a supported video link."
-    );
-    return;
-  }
-
-  if (!url) {
-    showMessage("Please paste a video link.");
-    return;
-  }
-
-  let clipCount = Number(
-    document.getElementById("clipCount")?.value || 5
-  );
-
-  const clipStyle =
-    document.getElementById("clipStyle")?.value ||
-    "Funny moments";
-
-  const project = {
-    title: "Video clipping project",
-    source: url,
-    style: clipStyle,
-    count: clipCount,
-    minDuration: 30,
-    maxDuration: 60,
-    date: new Date().toLocaleString(),
-    status: "Connecting"
-  };
-
-  projects.unshift(project);
-  renderProjects();
-
-  const button = form.querySelector(
-    'button[type="submit"], input[type="submit"]'
-  );
-
-  if (button) button.disabled = true;
-
-  showMessage("Connecting to Mojimaro AI engine...", true);
-
-  try {
-    const result = await fetch(API_URL + "/api/clip", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        videoUrl: url,
-        clipStyle: clipStyle,
-        clipCount: clipCount,
-        minDuration: 30,
-        maxDuration: 60
-      })
-    });
-
-    const data = await result.json();
-
-    if (data.status === "processor_not_connected") {
-      project.status = "Processor not connected";
-      renderProjects();
-
-      showMessage(
-        "Mojimaro received your link successfully! The actual video processing engine still needs to be installed.",
-        true
-      );
-    } else if (data.success) {
-      project.status = "Processing";
-      renderProjects();
-      showMessage(data.message || "Request accepted.", true);
-    } else {
-      project.status = "Failed";
-      renderProjects();
-      showMessage(data.error || "Unable to process this link.");
+    if (file) {
+      showMessage("Video file processing is not connected yet.");
+      return;
     }
 
-  } catch (error) {
-    project.status = "Connection error";
+    if (!url) {
+      showMessage("Please paste a video link.");
+      return;
+    }
+
+    try {
+      const parsedUrl = new URL(url);
+
+      if (parsedUrl.protocol !== "https:") {
+        showMessage("Please enter a secure HTTPS video link.");
+        return;
+      }
+    } catch {
+      showMessage("Please enter a valid video link.");
+      return;
+    }
+
+    const clipCount = Number(
+      document.getElementById("clipCount")?.value || 5
+    );
+
+    const clipStyle =
+      document.getElementById("clipStyle")?.value || "Funny moments";
+
+    const project = {
+      title: "Video clipping project",
+      source: url,
+      style: clipStyle,
+      count: clipCount,
+      date: new Date().toLocaleString(),
+      status: "Connecting"
+    };
+
+    projects.unshift(project);
     renderProjects();
 
-    showMessage(
-      "Could not connect to Mojimaro. Check your internet connection and try again."
-    );
-  } finally {
-    if (button) button.disabled = false;
-  }
-});
+    const button = form.querySelector('button[type="submit"]');
+
+    if (button) button.disabled = true;
+
+    showMessage("Connecting to Mojimaro AI engine...", true);
+
+    try {
+      const response = await fetch(API_URL + "/api/clip", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          videoUrl: url,
+          clipStyle: clipStyle,
+          clipCount: clipCount,
+          minDuration: 30,
+          maxDuration: 60
+        })
+      });
+
+      const data = await response.json();
+
+      console.log("Mojimaro HTTP status:", response.status);
+      console.log("Mojimaro response:", data);
+
+      if (data.status === "processor_not_connected") {
+        project.status = "Processor not connected";
+        showMessage(
+          "Mojimaro received your link! The actual AI video processor still needs to be connected.",
+          true
+        );
+      } else if (response.ok && data.success) {
+        project.status = "Request accepted";
+        showMessage(data.message || "Request accepted.", true);
+      } else {
+        project.status = "Request error";
+        showMessage(
+          "Mojimaro response: " +
+          (data.error || data.message || "Unknown error") +
+          " (HTTP " + response.status + ")"
+        );
+      }
+
+    } catch (error) {
+      console.error("Mojimaro connection error:", error);
+
+      project.status = "Connection error";
+
+      showMessage(
+        "Connection failed: " + error.message +
+        ". Please check the browser Console for details."
+      );
+
+    } finally {
+      renderProjects();
+      if (button) button.disabled = false;
+    }
+  });
+}
 
 function renderProjects() {
+  if (!projectList || !projectCount || !projectLabel) return;
+
   projectCount.textContent = projects.length;
 
   projectLabel.textContent =
@@ -153,10 +169,9 @@ function renderProjects() {
 
     const details = document.createElement("small");
     details.textContent =
-      project.style +
-      " · " + project.count + " clips" +
-      " · 30–60 seconds" +
-      " · " + project.date;
+      project.style + " · " +
+      project.count + " clips · " +
+      project.date;
 
     info.append(title, details);
 
